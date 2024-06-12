@@ -1,4 +1,4 @@
-const { User, Thought } = require('../models');
+const { User } = require('../models');
 const { signToken, AuthenticationError } = require('../utils/auth');
 
 const resolvers = {
@@ -8,7 +8,7 @@ const resolvers = {
         return User.findOne({ _id: context.user._id });
       }
       throw AuthenticationError;
-    },
+    }
   },
 
   Mutation: {
@@ -34,6 +34,7 @@ const resolvers = {
 
       return { token, user };
     },
+
     saveBook: async (parent, { newBook }, context) => {
       if (context.user) {
         const user = await User.findOneAndUpdate(
@@ -46,23 +47,19 @@ const resolvers = {
       throw AuthenticationError;
       ('You need to be logged in!');
     },
- 
-    },
-    removeThought: async (parent, { thoughtId }, context) => {
-      if (context.user) {
-        const thought = await Thought.findOneAndDelete({
-          _id: thoughtId,
-          thoughtAuthor: context.user.username,
-        });
 
-        await User.findOneAndUpdate(
+    removeBook: async (parent, { bookId }, context) => {
+      if (context.user) {
+        const user = await User.findOneAndUpdate(
           { _id: context.user._id },
-          { $pull: { thoughts: thought._id } }
+          { $pull: { savedBooks: {bookId} } }, { new: true }
         );
 
-        return thought;
+        return user;
       }
       throw AuthenticationError;
     },
 
+  },
+};
 module.exports = resolvers;
