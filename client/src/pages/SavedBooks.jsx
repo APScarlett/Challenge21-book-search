@@ -14,11 +14,10 @@ import {QUERY_ME} from '../utils/queries'
 import {REMOVE_BOOK} from '../utils/mutations';
 
 const SavedBooks = () => {
-  const [userData, setUserData] = useState({});
 
   // use this to determine if `useEffect()` hook needs to run again
  const {loading, data } =useQUERY(QUERY_ME)
- const {deleteBook, { error }} = useMutation(REMOVE_BOOK);
+ const [deleteBook, { error }] = useMutation(REMOVE_BOOK);
 
  const userData = data?.me || {}
  console.log(userData)
@@ -33,22 +32,23 @@ const SavedBooks = () => {
     }
 
     try {
-      await deleteBook( { variables: { bookId: bookId } });
+      await deleteBook( { variables: { bookId: bookId } })
 
       removeBookId(bookId);
+      window.location.reload();
     } catch (err) {
       console.error(err);
     }
   };
 
   // if data isn't here yet,let us know
-  if (!userDataLength) {
+  if (loading) {
     return <h2>LOADING...</h2>;
   }
 
   return (
     <>
-      <div className="text-light bg-dark p-5">
+           <div className="text-light bg-dark p-5">
         <Container>
           <h1>Viewing saved books!</h1>
         </Container>
